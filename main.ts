@@ -1,37 +1,44 @@
 input.onButtonPressed(Button.A, function () {
-    player.move(1)
+    Player.change(LedSpriteProperty.X, 1)
 })
 input.onButtonPressed(Button.AB, function () {
-    shoot = game.createSprite(player.get(LedSpriteProperty.X), player.get(LedSpriteProperty.Y))
+    shoot = game.createSprite(Player.get(LedSpriteProperty.X), Player.get(LedSpriteProperty.Y))
+    shoot.set(LedSpriteProperty.Brightness, 100)
     for (let index = 0; index < 4; index++) {
         shoot.change(LedSpriteProperty.Y, -1)
-        basic.pause(10)
-        if (Enemy.isTouching(shoot)) {
-            Enemy.delete()
+        basic.pause(100)
+        if (shoot.isTouching(Enemy)) {
             game.addScore(1)
         }
+        if (shoot.get(LedSpriteProperty.Y) <= 0) {
+            shoot.delete()
+        }
     }
-    shoot.delete()
 })
 input.onButtonPressed(Button.B, function () {
-    player.move(-1)
+    Player.change(LedSpriteProperty.X, -1)
 })
-let Enemy: game.LedSprite = null
+let EnemyFire: game.LedSprite = null
 let shoot: game.LedSprite = null
-let player: game.LedSprite = null
-player = game.createSprite(2, 4)
+let Enemy: game.LedSprite = null
+let Player: game.LedSprite = null
+game.setScore(0)
+Player = game.createSprite(2, 4)
+Enemy = game.createSprite(0, -4)
 basic.forever(function () {
-    Enemy = game.createSprite(randint(0, 4), 0)
+    Enemy.move(1)
+    basic.pause(100)
+    Enemy.ifOnEdgeBounce()
+    EnemyFire = game.createSprite(Enemy.get(LedSpriteProperty.X), Enemy.get(LedSpriteProperty.Y))
+    shoot.set(LedSpriteProperty.Brightness, 100)
     for (let index = 0; index < 4; index++) {
-        Enemy.change(LedSpriteProperty.Y, 1)
-        basic.pause(500)
-    }
-    basic.pause(10)
-    Enemy.delete()
-})
-basic.forever(function () {
-    if (Enemy.isTouching(player)) {
-        player.delete()
-        game.gameOver()
+        EnemyFire.change(LedSpriteProperty.Y, 1)
+        basic.pause(100)
+        if (EnemyFire.isTouching(Player)) {
+            game.addScore(-1)
+        }
+        if (EnemyFire.get(LedSpriteProperty.Y) <= 4) {
+            EnemyFire.delete()
+        }
     }
 })
